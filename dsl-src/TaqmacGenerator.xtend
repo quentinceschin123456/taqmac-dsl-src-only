@@ -7,6 +7,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import itineraire.Itineraire
 
 /**
  * Generates code from your model files on save.
@@ -19,311 +20,31 @@ class TaqmacGenerator extends AbstractGenerator {
 	var itineraire = resource.contents.get(0) as Itineraire
 	var package = "main.java.fr.taqmac"
 	var folderModel = "datamodel";
+
+	fsa.generateFile('genereatedJavascrtip.js',generateTransportListCheckBox(itineraire.modesTransport))
 	
-	generateBackModele(fsa,package,folderModel);
 	fsa.generateFile(package+'.services/HTTPService.java', templateHTTPService(package));
 	fsa.generateFile(package+'.utils/ResponseHttpUtils.java', templateResponseHTTPUtils(package));
 	}
 	
 	
-	def generateBackModele(IFileSystemAccess2 fsa,String packageName,String folder){
-		fsa.generateFile(packageName+"."+folder+'/Point.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public class Point {
-			
-				String position;
-				String name;
-			
-				public Point(String pos) {
-					position = pos;
-					name = "";
-				}
-			
-				public Point(String pos, String n) {
-					position = pos;
-					name = n;
-				}
-			}
-			
-			'''
-		);
-		fsa.generateFile(packageName+"."+folder+'/EndPoint.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public class EndPoint extends Point {
-				public EndPoint(String postion) {
-					super(postion);
-				}	
-				public EndPoint(String postion,String n) {
-					super(postion,n);
-				}
-			}
-			
-			'''
-		);
-		fsa.generateFile(packageName+"."+folder+'/StartPoint.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public class StartPoint extends Point {
-				public StartPoint(String postion) {
-					super(postion);
-				}
-				public StartPoint(String postion,String n) {
-					super(postion,n);
-				}
-			}
-			
-			'''
-		);
-		
-		fsa.generateFile(packageName+"."+folder+'/ModeTransport.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public enum ModeTransport {
-				CAR,WALK,BIKE,BUS,SUBWAY,TRAMWAY
-			}
-			
-			'''
-		);
-		
-		fsa.generateFile(packageName+"."+folder+'/TransportChoice.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public class TransportChoice {
-			
-				double speed;
-				ModeTransport modeTransport;
-				
-				public TransportChoice(ModeTransport mode) {
-					modeTransport = mode;
-					speed = getSpeedByTransportMode(mode);
-				}
-				
-				private double getSpeedByTransportMode(ModeTransport mode) {
-					return 1.0;
-				}
-			}
-			
-			'''
-		);
-		fsa.generateFile(packageName+"."+folder+'/Travel.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public class Travel {
-				TravelGeo travelGeo;
-				TransportChoice vehicle;
-			
-			
-				public Travel(TravelGeo travel,TransportChoice veh) {
-					travelGeo = travel;
-					vehicle = veh;
-				}
-			}
-			
-			'''
-		);
-		
-		fsa.generateFile(packageName+"."+folder+'/TravelComplete.java', 
-			'''
-			package «packageName».«folder»;
-			
-			import java.util.ArrayList;
-			import java.util.List;
-			
-			public class TravelComplete {
-				List<Travel> listTravel;
-			
-				TravelComplete(){
-					listTravel = new ArrayList<Travel>();
-				}
-			}
-			
-			'''
-		);
-		
-		fsa.generateFile(packageName+"."+folder+'/TravelGeo.java', 
-			'''
-			package «packageName».«folder»;
-			
-			public class TravelGeo {
-				
-				StartPoint start;
-				EndPoint end;
-				
-				public TravelGeo(StartPoint s, EndPoint e) {
-					start = s;
-					end = e;
-				}
-			}
-			
-			'''
-		);
-	}
 	
-	def templateHTTPService(String packName) {
-		'''
-		package «packName».services;
-		
-		import fr.taqmac.utils.ResponseHttpUtils;
-		import org.springframework.http.HttpHeaders;
-		import org.springframework.http.HttpStatus;
-		import org.springframework.http.ResponseEntity;
-		
-		import java.io.BufferedReader;
-		import java.io.DataOutputStream;
-		import java.io.IOException;
-		import java.io.InputStreamReader;
-		import java.net.HttpURLConnection;
-		import java.net.URL;
-		import java.nio.charset.StandardCharsets;
-		
-		
-		public class HTTPService {
-		
-			public static final String GET = "GET";
-			public static final String POST = "POST";
-			public static final String PUT = "PUT";
-			public static final String DELETE = "DELETE";
-			
-			
-			/**
-			 * Appel API sans argument
-			 * @param urlCalled : Adresse URL (HTTP)
-			 * @param requestMethod : Type de methode (HTTPService.POST, PUT, DELETE, GET)
-			 * @return TupleHttpUtils : Réponse de la requête body, code de retour
-			 * @throws IOException
-			 */
-			public static ResponseHttpUtils call(String urlCalled, String requestMethod) throws IOException {
-			
-				return call(urlCalled, requestMethod, "");
-			}
-			
-			/**
-			 * Appel API, précision de la méthode utilisé et arguments dans un tableau de string
-			 * @param urlCalled : Adresse URL (HTTP)
-			 * @param requestMethod : Type de méthode (HTTPService.POST, PUT, DELETE, GET)
-			 * @param requestArgs : Tableau de String (ex : [a=alpha,b=beta])
-			 * @return Réponse de la requête body, code de retour
-			 * @throws IOException
-			 */
-			public static ResponseHttpUtils call(String urlCalled, String requestMethod, String[] requestArgs) throws IOException {
-				
-				String argString = "";
-				for (int i=0; i<requestArgs.length; i++) {
-					argString += requestArgs[i];
-					if(i+1 < requestArgs.length) {
-						argString += "&";
-					}
-				}
-				return call(urlCalled, requestMethod, argString);
-			}
-			
-			/**
-			 * Appel API, précision de la méthode utilisé et arguments
-			 * @param urlCalled : Adresse URL (HTTP)
-			 * @param requestMethod (HTTPService.POST, PUT, DELETE, GET)
-			 * @param requestArgs : String (ex : a=apha&b=beta)
-			 * @return Réponse de la requête body, code de retour
-			 * @throws IOException
-			 */	
-			public static ResponseHttpUtils call(String urlCalled, String requestMethod, String requestArgs) throws IOException {
-		        
-		        URL url = new URL(urlCalled); // URL à appeller
-				HttpURLConnection con = (HttpURLConnection) url.openConnection(); // Ouverture connection
-				
-				// Configuration de la requête
-				con.setRequestMethod(requestMethod);
-				con.setRequestProperty("user-Agent", "Java client");
-				con.setConnectTimeout(5000);
-				con.setReadTimeout(5000);
-				con.setInstanceFollowRedirects(false); // Permet d'accepter les redirections s'il y en a
-				
-				// Si besoins d'envoyer des arguments dans la requête :
-				if (requestArgs != "") {
-					con.setDoOutput(true); // Précise que l'on ajoute des arguments dans la requête (dans le body)
-					byte[] postData = requestArgs.getBytes(StandardCharsets.UTF_8);
-					con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		
-					try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-		                wr.write(postData);
-		            }
-				}
-				
-				// Gère la redirection
-				int status = con.getResponseCode();
-				if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM) {
-					String location = con.getHeaderField("Location");
-					URL newUrl = new URL(location);
-					con = (HttpURLConnection) newUrl.openConnection();
-				}
-				
-				// Récupère la donnée de sortie
-				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-				String inputLine;
-				StringBuffer content = new StringBuffer();
-				while ((inputLine = in.readLine()) != null) {
-				    content.append(inputLine);
-				}
-				in.close();
-				
-				// Fermeture de la connection
-				con.disconnect();
-				
-				return new ResponseHttpUtils(content.toString(), status);
-			}
-		
-			public static ResponseEntity<String> createResponse(String content, HttpStatus status){
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Access-Control-Allow-Origin","*");
-				return new ResponseEntity<>(content,headers, status);
-			}
-		
+
+	def generateTransportListCheckBox(EList<ModeTransport> list){
+		```
+		function setCheckboxList(){
+			var listCheckbox = "";
+			var str = "";
+			list.forEach(trans => {
+				str = "<div>";
+				str += "<label for='trans.getType().toLowerCase()»'>«trans.getType()»</label>";
+				str += "<input type="checkbox" name="trans.getType().toLowerCase()" value="trans.getType().toLowerCase()" id="trans.getType().toLowerCase()">" 	
+				str += "</div>";
+				listCheckbox += str;
+			});
+ 			document.getElementById("transportationListContainer").innerHTML = listCheckbox;
 		}
-		'''
-	}
-	
-	def templateResponseHTTPUtils(String packName) {
-		'''
-		package «packName».utils;
-		
-		/**
-		 * Classe Tuple String,Int
-		 *
-		 */
-		public class ResponseHttpUtils {
-			
-			private int resultCode;
-			private String resultContent;
-			
-			public ResponseHttpUtils(String content, int code) {
-				this.resultContent = content;
-				this.resultCode = code;
-			}
-			
-			public void setResultCode(int code) {
-				this.resultCode = code;
-			}
-			
-			public int getResultCode() {
-				return this.resultCode;
-			}
-			
-			public void setResultContent(String content) {
-				this.resultContent = content;
-			}
-			
-			public String getResultContent() {
-				return this.resultContent;
-			}
-		}
-		
-		'''
+		setCheckboxList();
+		```
 	}
 }
