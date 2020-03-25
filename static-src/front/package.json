@@ -4,6 +4,7 @@
   "description": "Find your the best way to reach your goals",
   "main": "index.js",
   "dependencies": {
+    "http-server": "^0.12.1",
     "material-icons": "^0.3.1",
     "tailwindcss": "^1.1.4"
   },
@@ -11,7 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "local": "http-server . -p 8000",
-    "tailwind" : "npx tailwind build styles.css -o output.css"
+    "tailwind": "npx tailwind build styles.css -o output.css"
   },
   "author": "TaqMac Studio",
   "license": "ISC"
