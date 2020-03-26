@@ -17,14 +17,10 @@ import itineraire.Itineraire
 class TaqmacGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-	var itineraire = resource.contents.get(0) as Itineraire
-	var package = "main.java.fr.taqmac"
-	var folderModel = "datamodel";
+	var itineraire = resource.contents.get(0) as Itineraire ;
 
-	fsa.generateFile('genereatedJavascrtip.js',generateTransportListCheckBox(itineraire.modesTransport))
+	fsa.generateFile('generatedJavascript.js',generateTransportListCheckBox(itineraire.modesTransport));
 	
-	fsa.generateFile(package+'.services/HTTPService.java', templateHTTPService(package));
-	fsa.generateFile(package+'.utils/ResponseHttpUtils.java', templateResponseHTTPUtils(package));
 	}
 	
 	
