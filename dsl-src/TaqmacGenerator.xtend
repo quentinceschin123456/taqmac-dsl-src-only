@@ -8,6 +8,9 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import itineraire.Itineraire
+import itineraire.ModeTransport
+import org.eclipse.emf.common.util.EList
+import itineraire.ModeAffichage
 
 /**
  * Generates code from your model files on save.
@@ -18,29 +21,43 @@ class TaqmacGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 	var itineraire = resource.contents.get(0) as Itineraire ;
-
-	fsa.generateFile('generatedJavascript.js',generateTransportListCheckBox(itineraire.modesTransport));
+	fsa.generateFile('generatedJavascript.js',generateJavascript(itineraire));
 	
 	}
 	
+	def generateJavascript(Itineraire itineraire){
+		'''
+		«generateTransportListCheckBox(itineraire.modesTransport)»
+		«generateSelectMode(itineraire.modesAffichage)»
+		'''
+		
+	}
 	
 	
 
 	def generateTransportListCheckBox(EList<ModeTransport> list){
-		```
+		var listCheckbox = "";
+		var str = "";
+		'''
 		function setCheckboxList(){
-			var listCheckbox = "";
-			var str = "";
-			list.forEach(trans => {
+			«for (trans : list) {
 				str = "<div>";
-				str += "<label for='trans.getType().toLowerCase()Â»'>Â«trans.getType()Â»</label>";
-				str += "<input type="checkbox" name="trans.getType().toLowerCase()" value="trans.getType().toLowerCase()" id="trans.getType().toLowerCase()">" 	
+				str += "<label for='«trans.getType().toLowerCase()»'>«trans.getType()»</label>";
+				str += "<input type='checkbox' name='«trans.getType().toLowerCase()»' value='«trans.getType().toLowerCase()»' id='«trans.getType().toLowerCase()»'>" 	
 				str += "</div>";
 				listCheckbox += str;
-			});
- 			document.getElementById("transportationListContainer").innerHTML = listCheckbox;
+			}»
+ 			document.getElementById("transportationListContainer").innerHTML = «listCheckbox»;
 		}
 		setCheckboxList();
-		```
+		'''
+	}
+	
+	def generateSelectMode(EList<ModeAffichage> list){
+		'''
+		function createSelectDisplayMode(){
+
+		}
+		'''
 	}
 }
