@@ -54,10 +54,29 @@ class TaqmacGenerator extends AbstractGenerator {
 	}
 	
 	def generateSelectMode(EList<ModeAffichage> list){
+		var affichage = list.get(0).getType();
+		var html = "";
+		switch (affichage) {
+			case "Carte": {
+					
+					html = "document.getElementById(\"map\").style.display = \"flex\"";
+					html = "document.getElementById(\"route\").style.display = \"none\"";
+				}
+				case "Text": {
+					html = "document.getElementById(\"map\").style.display = \"none\"";
+				html = "document.getElementById(\"route\").style.display = \"flex\"";
+					
+				}
+			default: {
+				
+			}
+		}
+		
 		'''
 		function createSelectDisplayMode(){
-
+			«html»
 		}
+		createSelectDisplayMode();
 		'''
 	}
 }
