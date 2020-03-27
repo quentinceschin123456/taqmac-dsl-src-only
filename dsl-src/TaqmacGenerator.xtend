@@ -11,6 +11,7 @@ import itineraire.Itineraire
 import itineraire.ModeTransport
 import org.eclipse.emf.common.util.EList
 import itineraire.ModeAffichage
+import itineraire.PlageHoraire
 
 /**
  * Generates code from your model files on save.
@@ -29,6 +30,7 @@ class TaqmacGenerator extends AbstractGenerator {
 		'''
 		«generateTransportListCheckBox(itineraire.modesTransport)»
 		«generateSelectMode(itineraire.modesAffichage)»
+		«generateDateField(itineraire.plageHoraire)»
 		'''
 		
 	}
@@ -78,5 +80,9 @@ class TaqmacGenerator extends AbstractGenerator {
 		}
 		createSelectDisplayMode();
 		'''
+	}
+	
+	def generateDateField(PlageHoraire plage){
+		
 	}
 }
