@@ -49,7 +49,7 @@ class TaqmacGenerator extends AbstractGenerator {
 				str += "</div>";
 				listCheckbox += str;
 			}»
- 			document.getElementById("transportationListContainer").innerHTML = «listCheckbox»;
+ 			document.getElementById("transportationListContainer").innerHTML = '«listCheckbox»';
 		}
 		setCheckboxList();
 		'''
@@ -91,7 +91,7 @@ class TaqmacGenerator extends AbstractGenerator {
 					 "required>";
 		'''
 		function createTimeSlots(){	 
-			document.getElementById("timeSlotsContainer").innerHTML = «html»;
+			document.getElementById("timeSlotsContainer").innerHTML = '«html»';
 		}
 		createTimeSlots();
 		'''
