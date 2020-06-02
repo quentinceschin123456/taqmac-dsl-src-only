@@ -84,5 +84,16 @@ class TaqmacGenerator extends AbstractGenerator {
 	
 	def generateDateField(PlageHoraire plage){
 		
+		var html = "<input type='time'"+
+					"id='timeSlotImput'"+
+					"min='"+plage.debut+"'"+
+					"max='"+plage.fin+"'"+
+					 "required>";
+		'''
+		function createTimeSlots(){	 
+			document.getElementById("timeSlotsContainer").innerHTML = «html»;
+		}
+		createTimeSlots();
+		'''
 	}
 }
